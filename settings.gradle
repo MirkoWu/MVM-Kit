@@ -1,0 +1,5 @@
+rootProject.name = "mvmtools"
+include ':app'
+include ':lib_widget'
+include ':lib_ble'
+include ':lib_util'

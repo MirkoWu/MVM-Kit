@@ -1,0 +1,136 @@
+package com.mirkowu.mvm.ble
+
+import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.mirkowu.lib_base.mediator.EmptyMediator
+import com.mirkowu.lib_ble.BLEClient
+import com.mirkowu.lib_ble.BLEManager
+import com.mirkowu.lib_ble.BLEService
+import com.mirkowu.lib_util.LogUtil
+import com.mirkowu.lib_util.PermissionsUtil
+import com.mirkowu.lib_util.utilcode.util.ConvertUtils
+import com.mirkowu.lib_util.utilcode.util.ToastUtils
+import com.mirkowu.mvm.R
+import com.mirkowu.mvm.base.BaseActivity
+
+class BleActivity : BaseActivity<EmptyMediator>() {
+
+
+    companion object {
+        @JvmStatic
+        fun start(context: Context) {
+            val starter = Intent(context, BleActivity::class.java)
+//            .putExtra()
+            context.startActivity(starter)
+        }
+    }
+
+
+    private lateinit var mAdapter: DeviceAdapter
+    private lateinit var bleManager: BLEManager
+    private val TAG = javaClass.simpleName
+    private val bleReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            if (BLEService.ACTION_GATT_CONNECTED.equals(action)) {  //gatt 仅仅连接蓝牙
+                LogUtil.e(TAG, "Only gatt, just wait")
+            } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) { //断开连接
+                LogUtil.e(TAG, "action_gatt_disconnected")
+            } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) { //发现蓝牙服务，可以进行通信了
+                LogUtil.e(TAG, "In what we need 发现蓝牙服务，可以进行通信了")
+            } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) { //收到数据
+                LogUtil.e(TAG, "RECV DATA")
+                val data = intent.getByteArrayExtra(BLEService.EXTRA_DATA)
+                if (data != null) {
+                    val rec: String = ConvertUtils.bytes2HexString(data)
+                    LogUtil.d("接收数据$rec")
+                }
+            }
+        }
+    }
+
+    override fun getLayoutId() = R.layout.activity_ble
+
+
+    override fun initialize() {
+        val rvSearch: RecyclerView = findViewById(R.id.rvSearch)
+        mAdapter = DeviceAdapter();
+        rvSearch.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = mAdapter
+        }
+        mAdapter.setOnItemClickListener { view, item, position ->
+            val device = mAdapter.getItem(position);
+            // bleManager.connect(device.address, true)
+        };
+
+        bleManager = BLEManager.getInstance()
+        startLeScan();
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(bleReceiver, BLEClient.makeGattUpdateIntentFilter())
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(bleReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bleManager.stopLeScan()
+        bleManager.close()
+    }
+
+    private fun startLeScan() {
+        if (bleManager.isConnected) {
+            bleManager.disconnect()
+        }
+        if (bleManager.isSupportBLE(context)) {
+            PermissionsUtil.getInstance()
+                .requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.BLUETOOTH),
+                    object : PermissionsUtil.OnPermissionsListener {
+                        override fun onPermissionGranted(requestCode: Int) {
+                            if (bleManager.isEnable()) {
+                                val scanning = bleManager.startLeScan { device, rssi, scanRecord ->
+                                    //type=1传统蓝牙  2BLE 3 双模蓝牙 0未知
+                                     if (!mAdapter.getData().contains(device) && device.type >= 2) {
+                                    LogUtil.e(TAG, "发现设备：" + device.name)
+                                    mAdapter.addData(device )
+                                    mAdapter.notifyDataSetChanged()
+                                    }
+                                }
+                                LogUtil.e("蓝牙scanning" + scanning)
+
+                            } else {
+                                val isEnable = bleManager.enable()
+                                LogUtil.e("蓝牙是否可用" + isEnable)
+                            }
+                        }
+
+                        override fun onPermissionShowRationale(
+                            requestCode: Int,
+                            permissions: Array<out String>?
+                        ) {
+                            ToastUtils.showShort("检测到GPS/位置服务功能未开启，请开启 111111")
+                            startLeScan()
+                        }
+
+                        override fun onPermissionDenied(requestCode: Int) {
+                            ToastUtils.showShort("检测到GPS/位置服务功能未开启，请开启")
+                        }
+                    })
+        } else {
+            ToastUtils.showShort("当前设备不支持BLE")
+        }
+    }
+
+}
