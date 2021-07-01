@@ -1,7 +1,6 @@
 package com.mirkowu.mvm.ble
 
 import android.bluetooth.BluetoothAdapter.LeScanCallback
-import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,6 +16,7 @@ import com.mirkowu.lib_util.utilcode.util.ConvertUtils
 import com.mirkowu.lib_util.utilcode.util.ToastUtils
 import com.mirkowu.mvm.R
 import com.mirkowu.mvm.base.BaseActivity
+import com.mirkowu.mvm.databinding.ActivitySearchBleBinding
 
 class SearchBleActivity : BaseActivity<EmptyMediator>() {
 
@@ -64,8 +64,8 @@ class SearchBleActivity : BaseActivity<EmptyMediator>() {
         rvSearch.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener { view, item, position ->
             val device = mAdapter.getItem(position);
-//            client.connect(device.getAddress(), true);
-//            client.startMonitor(getContext(), bleReceiver, BLEClient.makeGattUpdateIntentFilter());
+            client.connect(device.getAddress(), true);
+            client.startMonitor(getContext(), bleReceiver, BLEClient.makeGattUpdateIntentFilter());
         };
         client = BLEClient.getInstance()
         startLeScan();

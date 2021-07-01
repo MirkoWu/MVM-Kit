@@ -9,12 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mirkowu.lib_base.adapter.BaseAdapter;
+import com.mirkowu.lib_widget.adapter.BaseRVAdapter;
 import com.mirkowu.mvm.R;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DeviceAdapter extends BaseAdapter<BluetoothDevice, DeviceAdapter.ViewHolder> {
+public class DeviceAdapter extends BaseRVAdapter<BluetoothDevice, DeviceAdapter.ViewHolder> {
 
     @Override
     public void onBindHolder(@NonNull @NotNull ViewHolder holder, BluetoothDevice item, int position) {

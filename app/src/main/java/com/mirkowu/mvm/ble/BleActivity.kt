@@ -65,7 +65,7 @@ class BleActivity : BaseActivity<EmptyMediator>() {
         }
         mAdapter.setOnItemClickListener { view, item, position ->
             val device = mAdapter.getItem(position);
-            // bleManager.connect(device.address, true)
+             bleManager.connect(device.address, true)
         };
 
         bleManager = BLEManager.getInstance()
