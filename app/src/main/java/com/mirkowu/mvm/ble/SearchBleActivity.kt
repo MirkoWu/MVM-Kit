@@ -108,7 +108,7 @@ class SearchBleActivity : BaseActivity<EmptyMediator>() {
 
                         override fun onPermissionShowRationale(
                             requestCode: Int,
-                            permissions: Array<out String>?
+                            permissions: Array<out String>
                         ) {
                             ToastUtils.showShort("检测到GPS/位置服务功能未开启，请开启 111111")
                             startLeScan()

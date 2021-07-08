@@ -36,7 +36,6 @@ import android.util.Log;
 import com.mirkowu.lib_util.LogUtil;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -76,8 +75,8 @@ public class BLEService extends Service {
 //    public final static UUID UUID_NOTIFY =
 //            UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb");
 //
-    private String UUID_SERVICE="00001800-0000-1000-8000-00805f9b34fb";
-    private String UUID_NOTIFY="00002a00-0000-1000-8000-00805f9b34fb";
+    private String UUID_SERVICE = "00001800-0000-1000-8000-00805f9b34fb";
+    private String UUID_NOTIFY = "00002a00-0000-1000-8000-00805f9b34fb";
 
     public BluetoothGattCharacteristic mNotifyCharacteristic;
 

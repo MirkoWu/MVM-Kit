@@ -54,6 +54,8 @@ dependencies {
     implementation "com.github.mirkowu.mvm:lib_widget:$ext.mvm_version"
     implementation "com.github.mirkowu.mvm:lib_util:$ext.mvm_version"
     implementation "com.github.mirkowu.mvm:lib_screen:$ext.mvm_version"
+
+//    implementation "com.github.mirkowu.tools:lib_ble:$ext.tools_version"
     implementation project(':lib_ble')
 
 }
