@@ -7,16 +7,15 @@ import android.content.Intent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mirkowu.lib_base.mediator.EmptyMediator
-import com.mirkowu.lib_ble.BLEClient
-import com.mirkowu.lib_ble.BLEService
-import com.mirkowu.lib_ble.OnServiceConnectListener
+import com.mirkowu.lib_ble.service.BLEClient
+import com.mirkowu.lib_ble.service.BLEService
+import com.mirkowu.lib_ble.service.OnServiceConnectListener
 import com.mirkowu.lib_util.LogUtil
 import com.mirkowu.lib_util.PermissionsUtil
 import com.mirkowu.lib_util.utilcode.util.ConvertUtils
 import com.mirkowu.lib_util.utilcode.util.ToastUtils
 import com.mirkowu.mvm.R
 import com.mirkowu.mvm.base.BaseActivity
-import com.mirkowu.mvm.databinding.ActivitySearchBleBinding
 
 class SearchBleActivity : BaseActivity<EmptyMediator>() {
 
@@ -80,7 +79,8 @@ class SearchBleActivity : BaseActivity<EmptyMediator>() {
                     object : PermissionsUtil.OnPermissionsListener {
                         override fun onPermissionGranted(requestCode: Int) {
                             if (client.isEnable()) {
-                                client.bindService(context, object : OnServiceConnectListener {
+                                client.bindService(context, object :
+                                    OnServiceConnectListener {
                                     override fun onServiceConnected() {
                                         /**
                                          * 请在BLEService中修改需要的服务值

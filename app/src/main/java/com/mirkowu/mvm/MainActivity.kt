@@ -5,6 +5,7 @@ import com.mirkowu.lib_base.mediator.EmptyMediator
 import com.mirkowu.mvm.base.BaseActivity
 import com.mirkowu.mvm.ble.BleActivity
 import com.mirkowu.mvm.ble.SearchBleActivity
+import com.mirkowu.mvm.classicsbluetooth.ClassicsBluetoothActivity
 
 class MainActivity : BaseActivity<EmptyMediator>() {
 
@@ -16,5 +17,9 @@ class MainActivity : BaseActivity<EmptyMediator>() {
     fun searchBle(view: View) {
 //        SearchBleActivity.start(this)
         BleActivity.start(this)
+    }
+
+    fun searchBluetooth(view: android.view.View) {
+        ClassicsBluetoothActivity.start(this)
     }
 }

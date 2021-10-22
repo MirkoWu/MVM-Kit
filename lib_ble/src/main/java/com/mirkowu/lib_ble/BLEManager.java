@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
+import com.mirkowu.lib_ble.service.BLEService;
 import com.mirkowu.lib_util.LogUtil;
 import com.mirkowu.lib_util.utilcode.util.Utils;
 
@@ -75,8 +76,8 @@ public class BLEManager {
 //    public   static UUID UUID_NOTIFY =
 //            UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb");
 
-    private String UUID_SERVICE = "00001800-0000-1000-8000-00805f9b34fb";
-    private String UUID_NOTIFY = "00002a00-0000-1000-8000-00805f9b34fb";
+    private String UUID_SERVICE = "";
+    private String UUID_NOTIFY = "";
 
     private static final int SCAN_TIME = 10000;
 

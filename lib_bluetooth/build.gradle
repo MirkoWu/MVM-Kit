@@ -1,0 +1,36 @@
+plugins {
+    id 'com.android.library'
+}
+
+def ext = rootProject.ext
+android {
+    compileSdkVersion ext.compileSdkVersion
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion ext.minSdkVersion
+        targetSdkVersion ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        consumerProguardFiles "proguard-rules.pro"
+    }
+
+//    buildTypes {
+//        release {
+//            consumerProguardFiles "proguard-rules.pro"
+//        }
+//    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "androidx.appcompat:appcompat:$ext.appcompat_version"
+    implementation "com.github.mirkowu.mvm:lib_util:$ext.mvm_version"
+
+}

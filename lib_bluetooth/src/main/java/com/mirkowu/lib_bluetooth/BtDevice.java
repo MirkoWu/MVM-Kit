@@ -1,0 +1,203 @@
+package com.mirkowu.lib_bluetooth;
+
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanRecord;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * Created by LiuLei on 2016/11/26.
+ */
+public class BtDevice implements Parcelable {
+
+    public static final int DISCONNECT = 0;
+    public static final int CONNECTING = 1;
+    public static final int CONNECTED = 2;
+
+    public final static String TAG = BleDevice.class.getSimpleName();
+    private static final long serialVersionUID = -2576082824642358033L;
+
+    /**
+     * 连接状态
+     * 2503 未连接状态
+     * 2504 正在连接
+     * 2505 连接成功
+     */
+    private int mConnectionState = DISCONNECT;
+
+    /*蓝牙地址*/
+    private String address;
+
+    /*蓝牙名称*/
+    private String name;
+
+    /*蓝牙重命名名称（别名）*/
+    private String alias;
+
+    /**
+     * DEVICE_TYPE_UNKNOWN = 0
+     * DEVICE_TYPE_CLASSIC = 1
+     * DEVICE_TYPE_LE = 2
+     * DEVICE_TYPE_DUAL = 3
+     */
+    private int mDeviceType = BluetoothDevice.DEVICE_TYPE_LE;
+
+    /*是否自动连接*/
+    private boolean mAutoConnect = BtManager.options().autoConnect;//The default is not automatic connection
+
+    /*是否正在自动重连*/
+    private boolean isAutoConnecting = false;
+
+    /*解析后的广播包数据*/
+    private ScanRecord scanRecord;
+
+    /**
+     * 自定义属性值
+     */
+    private Map<String, Object> mPropertyMap;
+
+    /**
+     * Use the address and name of the BluetoothDevice object
+     * to construct the address and name of the {@code BleDevice} object
+     */
+    protected BtDevice(String address, String name) {
+        this.address = address;
+        this.name = name;
+    }
+
+    protected BtDevice(Parcel in) {
+        mConnectionState = in.readInt();
+        mDeviceType = in.readInt();
+        address = in.readString();
+        name = in.readString();
+        alias = in.readString();
+        mAutoConnect = in.readByte() != 0;
+        isAutoConnecting = in.readByte() != 0;
+        mPropertyMap = new HashMap<>();
+        in.readMap(mPropertyMap, getClass().getClassLoader());
+    }
+
+    public boolean isConnected() {
+        return mConnectionState == CONNECTED;
+    }
+
+    public boolean isConnecting() {
+        return mConnectionState == CONNECTING;
+    }
+
+    public boolean isDisconnected() {
+        return mConnectionState == DISCONNECT;
+    }
+
+    public boolean isAutoConnect() {
+        return mAutoConnect;
+    }
+
+    public void setAutoConnect(boolean mAutoConnect) {
+        this.mAutoConnect = mAutoConnect;
+    }
+
+    public boolean isAutoConnecting() {
+        return isAutoConnecting;
+    }
+
+    public void setAutoConnecting(boolean autoConnecting) {
+        isAutoConnecting = autoConnecting;
+    }
+
+    public int getConnectionState() {
+        return mConnectionState;
+    }
+
+    public void setConnectionState(int state) {
+        mConnectionState = state;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String mBleAddress) {
+        this.address = mBleAddress;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String mBleName) {
+        this.name = mBleName;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String mBleAlias) {
+        this.alias = mBleAlias;
+    }
+
+    public ScanRecord getScanRecord() {
+        return scanRecord;
+    }
+
+    public void setScanRecord(ScanRecord scanRecord) {
+        this.scanRecord = scanRecord;
+    }
+
+    public int getDeviceType() {
+        return mDeviceType;
+    }
+
+    public void setDeviceType(int deviceType) {
+        this.mDeviceType = deviceType;
+    }
+
+    public void put(String key, Object value){
+        if (mPropertyMap == null){
+            mPropertyMap = new HashMap<>();
+        }
+        mPropertyMap.put(key, value);
+    }
+
+    public Object get(String key){
+        if (mPropertyMap == null){
+            return null;
+        }
+        return mPropertyMap.get(key);
+    }
+
+    @Override
+    public String toString() {
+        return "BleDevice{" +
+                "mConnectionState=" + mConnectionState +
+                ", mDeviceType=" + mDeviceType +
+                ", mBleAddress='" + address + '\'' +
+                ", mBleName='" + name + '\'' +
+                ", mBleAlias='" + alias + '\'' +
+                ", mAutoConnect=" + mAutoConnect +
+                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mConnectionState);
+        dest.writeInt(mDeviceType);
+        dest.writeString(address);
+        dest.writeString(name);
+        dest.writeString(alias);
+        dest.writeByte((byte) (mAutoConnect ? 1 : 0));
+        dest.writeByte((byte) (isAutoConnecting ? 1 : 0));
+        dest.writeMap(mPropertyMap);
+    }
+}

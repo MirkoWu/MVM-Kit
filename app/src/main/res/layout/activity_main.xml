@@ -21,6 +21,12 @@
                 android:onClick="searchBle"
                 android:text="搜索Ble" />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="searchBluetooth"
+                android:text="搜索经典蓝牙" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

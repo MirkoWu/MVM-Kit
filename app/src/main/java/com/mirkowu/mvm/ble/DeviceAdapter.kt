@@ -1,41 +1,13 @@
-package com.mirkowu.mvm.ble;
+package com.mirkowu.mvm.ble
 
-import android.bluetooth.BluetoothDevice;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.bluetooth.BluetoothDevice
+import com.mirkowu.lib_widget.adapter.BaseRVHolder
+import com.mirkowu.lib_widget.adapter.SimpleRVAdapter
+import com.mirkowu.mvm.R
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.mirkowu.lib_widget.adapter.BaseRVAdapter;
-import com.mirkowu.mvm.R;
-
-import org.jetbrains.annotations.NotNull;
-
-public class DeviceAdapter extends BaseRVAdapter<BluetoothDevice, DeviceAdapter.ViewHolder> {
-
-    @Override
-    public void onBindHolder(@NonNull @NotNull ViewHolder holder, BluetoothDevice item, int position) {
-        holder.tvName.setText(item.getName() + "\n" + item.getAddress());
+class DeviceAdapter : SimpleRVAdapter<BluetoothDevice>(R.layout.item_device) {
+    override fun onBindHolder(holder: BaseRVHolder, item: BluetoothDevice, position: Int) {
+        holder.setText(R.id.tvName, "${item?.name} \n ${item?.address}")
     }
 
-    @NonNull
-    @NotNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_device, parent, false));
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView tvName;
-
-        public ViewHolder(@NonNull @NotNull View itemView) {
-            super(itemView);
-            tvName = itemView.findViewById(R.id.tvName);
-
-        }
-    }
 }
