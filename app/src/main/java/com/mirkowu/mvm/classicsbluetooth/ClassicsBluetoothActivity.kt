@@ -8,22 +8,22 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
 import android.provider.Settings
-import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mirkowu.lib_base.mediator.EmptyMediator
 import com.mirkowu.lib_base.util.bindingView
-import com.mirkowu.lib_ble.ble.model.ScanRecord
 import com.mirkowu.lib_ble.ble.utils.Utils
+import com.mirkowu.lib_util.LogUtil
 import com.mirkowu.lib_util.ktxutil.click
 import com.mirkowu.lib_util.utilcode.util.ToastUtils
 import com.mirkowu.lib_widget.decoration.LinearDecoration
 import com.mirkowu.lib_widget.dialog.PromptDialog
 import com.mirkowu.mvm.R
 import com.mirkowu.mvm.base.BaseActivity
-import com.mirkowu.mvm.ble.BleRssiDevice
 import com.mirkowu.mvm.ble.DeviceAdapter
+import com.mirkowu.mvm.classicsbluetooth.callback.OnConnectStateCallback
 import com.mirkowu.mvm.databinding.ActivityClassicsBluetoothBinding
+import java.util.*
 
 class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
     companion object {
@@ -39,7 +39,8 @@ class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
     private val mBinding by bindingView(ActivityClassicsBluetoothBinding::inflate)
     private val mBtManager: BtManager = BtManager.getInstance()
     public lateinit var mAdapter: DeviceAdapter
-    val mBtService = BtService.getInstance()
+
+    // val mBtService = BtService.getInstance()
     override fun getLayoutId() = R.layout.activity_classics_bluetooth
     override fun initialize() {
         mAdapter = DeviceAdapter()
@@ -62,27 +63,34 @@ class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
                 mBtManager.cancelDiscovery()
             }
         }
-        mBtService.setOnConnectStateListener(object : BtService.OnConnectStateListener {
-            override fun onConnectSuccess() {
-                runOnUiThread {
-                    BtSendRecActivity.start(context, mBtService.connectDevice)
-                }
 
+        //如果能自动连接，就自动连接
+        if (mBtManager.enableAutoConnect()) {
+            mBtManager.autoConnect(mConnectStateListener)
+        }
+
+
+    }
+
+    private val mConnectStateListener = object : OnConnectStateCallback {
+        override fun onConnectSuccess() {
+            runOnUiThread {
+                BtSendRecActivity.start(context, mBtManager.connectDevice)
             }
 
-            override fun onConnectFailed() {
-            }
+        }
 
-            override fun onConnecting() {
-            }
+        override fun onConnectFailed() {
+        }
 
-            override fun onWaitConnect() {
-            }
+        override fun onConnecting() {
+        }
 
-            override fun onConnectStateChanged(state: Int) {
-            }
+        override fun onWaitConnect() {
+        }
 
-        })
+        override fun onConnectStateChanged(state: Int) {
+        }
 
     }
 
@@ -91,7 +99,7 @@ class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
             .setContent("确定要连接此设备吗?")
             .setOnButtonClickListener { dialog, isPositiveClick ->
                 if (isPositiveClick) {
-                    mBtService.connect(device)
+                    mBtManager.connect(device, mConnectStateListener)
                 }
             }.show(supportFragmentManager)
     }
@@ -135,6 +143,12 @@ class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
             mAdapter.clearAll()
             checkBlueStatus()
         }
+
+        val list = mBtManager.bondedDevices
+        for (item in list) {
+            mAdapter.addData(0, item)
+            LogUtil.e("已绑定设备= " + item.name + "  " + item.address)
+        }
     }
 
     override fun onResume() {
@@ -153,7 +167,11 @@ class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
             mReceiver =
                 object : BluetoothSearchReceiver() {
                     override fun onDeviceFound(device: BluetoothDevice) {
-                        mAdapter.addData(device)
+                        if (device.bondState == BluetoothDevice.BOND_BONDED) {
+                            mAdapter.addData(0, device)
+                        } else {
+                            mAdapter.addData(device)
+                        }
                     }
                 }
             registerReceiver(
@@ -185,6 +203,11 @@ class ClassicsBluetoothActivity : BaseActivity<EmptyMediator>() {
 
 
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mBtManager.release()
     }
 }
 

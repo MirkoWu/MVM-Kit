@@ -7,7 +7,8 @@ import com.mirkowu.mvm.R
 
 class DeviceAdapter : SimpleRVAdapter<BluetoothDevice>(R.layout.item_device) {
     override fun onBindHolder(holder: BaseRVHolder, item: BluetoothDevice, position: Int) {
-        holder.setText(R.id.tvName, "${item?.name} \n ${item?.address}")
+        holder.setText(R.id.tvName, "${item?.name} \n ${item?.address} \n" +
+                "是否绑定：${item.bondState == BluetoothDevice.BOND_BONDED} ")
     }
 
 }

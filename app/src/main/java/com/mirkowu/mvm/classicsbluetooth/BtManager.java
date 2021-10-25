@@ -18,12 +18,24 @@ package com.mirkowu.mvm.classicsbluetooth;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
+import com.mirkowu.lib_util.LogUtil;
+import com.mirkowu.mvm.classicsbluetooth.callback.OnConnectStateCallback;
+import com.mirkowu.mvm.classicsbluetooth.callback.OnDataReceiveCallback;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -68,13 +80,13 @@ public final class BtManager {
         }
         return sInstance;
     }
+
     private BtManager() {
         init();
     }
 
     /**
      * bluetooth initialization
-     *
      */
     public void init(/*Context context, InitCallback callback*/) {
 //        if (context == null) {
@@ -115,26 +127,114 @@ public final class BtManager {
 //        }
     }
 
+    @NonNull
+    public List<BluetoothDevice> getBondedDevices() {
+        List<BluetoothDevice> list = new ArrayList<>();
+        list.addAll(getBluetoothAdapter().getBondedDevices());
+        return list;
+    }
+
     public boolean startDiscovery() {
-        return bluetoothAdapter.startDiscovery();
+        return getBluetoothAdapter().startDiscovery();
     }
 
     public boolean cancelDiscovery() {
-        return bluetoothAdapter.cancelDiscovery();
+        return getBluetoothAdapter().cancelDiscovery();
     }
 
     public boolean isDiscovering() {
-        return bluetoothAdapter.isDiscovering();
+        return getBluetoothAdapter().isDiscovering();
     }
 
-    public BluetoothSocket connectRf(BluetoothDevice device, String uuid) throws IOException {
-        return device.createRfcommSocketToServiceRecord(UUID.fromString(uuid));//明文传输(不安全)，无需配对
+    public BluetoothSocket connectRf(BluetoothDevice device, UUID uuid) throws IOException {
+        return device.createRfcommSocketToServiceRecord(uuid);//明文传输(不安全)，无需配对
     }
 
-    public BluetoothSocket connectInsecureRf(BluetoothDevice device, String uuid) throws IOException {
-        return device.createInsecureRfcommSocketToServiceRecord(UUID.fromString(uuid));//加密传输，Android强制执行配对，弹窗显示配对码
+    public BluetoothSocket connectInsecureRf(BluetoothDevice device, UUID uuid) throws IOException {
+        return device.createInsecureRfcommSocketToServiceRecord(uuid);//加密传输，Android强制执行配对，弹窗显示配对码
     }
 
+    public BluetoothServerSocket listenUsingRfcommWithServiceRecord(String name, UUID uuid) throws IOException {
+        return getBluetoothAdapter().listenUsingRfcommWithServiceRecord(name, uuid);
+    }
+
+    public void connect(BluetoothDevice device, OnConnectStateCallback onConnectStateCallback) {
+        BtClient.getInstance().connect(device, onConnectStateCallback);
+    }
+
+    public void connect(BluetoothSocket socket,
+                        BluetoothDevice device) {
+        BtClient.getInstance().connected(socket, device);
+    }
+
+    public BluetoothDevice getConnectDevice() {
+        return BtClient.getInstance().getConnectDevice();
+    }
+
+    /**
+     * 自动连接上次连接成功的设备
+     *
+     * @param onConnectStateCallback
+     */
+    public void autoConnect(OnConnectStateCallback onConnectStateCallback) {
+        String address = getAutoConnectAddress();
+        if (!TextUtils.isEmpty(address)) {
+            LogUtil.e(TAG, "自动连接");
+            BluetoothDevice device = getBluetoothAdapter().getRemoteDevice(address);
+            connect(device, onConnectStateCallback);
+        }
+    }
+
+    /**
+     * 是否能自动连接
+     *
+     * @return
+     */
+    public boolean enableAutoConnect() {
+        return !TextUtils.isEmpty(getAutoConnectAddress());
+    }
+
+    /**
+     * 获取自动连接的地址
+     *
+     * @return
+     */
+    private String getAutoConnectAddress() {
+        String address = BtCache.getLastConnectDevice();
+        if (TextUtils.isEmpty(address)) {
+            return "";
+        }
+        List<BluetoothDevice> list = getBondedDevices();
+        if (list.isEmpty()) {
+            return "";
+        }
+        for (BluetoothDevice device : list) {
+            if (TextUtils.equals(address, device.getAddress())) {
+                return address;
+            }
+        }
+        return "";
+    }
+
+    public void start() {
+        BtClient.getInstance().start();
+    }
+
+    public void stop() {
+        BtClient.getInstance().stop();
+    }
+
+    public void write(byte[] bytes) {
+        BtClient.getInstance().write(bytes);
+    }
+
+    public void write(byte[] bytes, long delayTime) {
+        BtClient.getInstance().write(bytes, delayTime);
+    }
+
+    public void setOnDataReceiveCallback(OnDataReceiveCallback onDataReceiveCallback) {
+        BtClient.getInstance().setOnDataReceiveCallback(onDataReceiveCallback);
+    }
 //    public static <T extends BleDevice> BleManager<T> create(Context context, InitCallback callback) {
 //        return create(context, options(), callback);
 //    }
@@ -154,58 +254,7 @@ public final class BtManager {
 //        }
 //    }
 //
-//    /**
-//     * start scanning
-//     */
-//    public void startScan(BleScanCallback<T> callback) {
-//        request.startScan(callback, options().scanPeriod);
-//    }
-//
-//    public void startScan(BleScanCallback<T> callback, long scanPeriod) {
-//        request.startScan(callback, scanPeriod);
-//    }
-//
-//    /**
-//     * stop scanning
-//     */
-//    public void stopScan() {
-//        request.stopScan();
-//    }
-//
-//    /**
-//     * connect bluetooth
-//     */
-//    public void connect(T device, BleConnectCallback<T> callback) {
-//        synchronized (locker) {
-//            request.connect(device, callback);
-//        }
-//    }
-//
-//    /**
-//     * connect to the device through the mac address
-//     */
-//    public void connect(String address, BleConnectCallback<T> callback) {
-//        synchronized (locker) {
-//            request.connect(address, callback);
-//        }
-//    }
-//
-//    public void connects(List<T> devices, BleConnectCallback<T> callback) {
-//        ConnectRequest<T> request = Rproxy.getRequest(ConnectRequest.class);
-//        request.connect(devices, callback);
-//    }
-//
-//    public void cancelConnecting(T device) {
-//        ConnectRequest<T> request = Rproxy.getRequest(ConnectRequest.class);
-//        request.cancelConnecting(device);
-//    }
-//
-//    public void cancelConnectings(List<T> devices) {
-//        ConnectRequest<T> request = Rproxy.getRequest(ConnectRequest.class);
-//        request.cancelConnectings(devices);
-//    }
-//
-//    /**
+    //    /**
 //     * set whether to automatically connect
 //     */
 //    public void autoConnect(T device, boolean autoConnect) {
@@ -214,28 +263,6 @@ public final class BtManager {
 //
 //    public void cancelAutoConnects() {
 //        DefaultReConnectHandler.provideReconnectHandler().cancelAutoConnect();
-//    }
-//
-//    /**
-//     * disconnect
-//     *
-//     * @param device
-//     */
-//    public void disconnect(T device) {
-//        request.disconnect(device);
-//    }
-//
-//    public void disconnect(T device, BleConnectCallback<T> callback) {
-//        request.disconnect(device, callback);
-//    }
-//
-//    public void disconnectAll() {
-//        Collection<T> connectedDevices = getConnectedDevices();
-//        if (!connectedDevices.isEmpty()) {
-//            for (T device : connectedDevices) {
-//                request.disconnect(device);
-//            }
-//        }
 //    }
 
 
@@ -294,6 +321,50 @@ public final class BtManager {
             return bluetoothAdapter.disable();
         }
         return true;
+    }
+
+
+    /**
+     * register bluetooth receiver
+     *
+     * @param receiver bluetooth broadcast receiver
+     * @param activity activity
+     */
+    public static void registerBluetoothReceiver(BroadcastReceiver receiver, Activity activity) {
+        if (null == receiver || null == activity) {
+            return;
+        }
+        IntentFilter intentFilter = new IntentFilter();
+        //start discovery
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        //finish discovery
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        //bluetooth status change
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        //found device
+        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        //bond status change
+        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        //pairing device
+        intentFilter.addAction("android.bluetooth.device.action.PAIRING_REQUEST");
+        activity.registerReceiver(receiver, intentFilter);
+    }
+
+    /**
+     * unregister bluetooth receiver
+     *
+     * @param receiver bluetooth broadcast receiver
+     * @param activity activity
+     */
+    public static void unregisterBluetoothReceiver(BroadcastReceiver receiver, Activity activity) {
+        if (null == receiver || null == activity) {
+            return;
+        }
+        activity.unregisterReceiver(receiver);
+    }
+
+    public void release(){
+        BtClient.getInstance().release();
     }
 
 }

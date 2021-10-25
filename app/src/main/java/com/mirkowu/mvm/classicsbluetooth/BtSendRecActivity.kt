@@ -36,7 +36,7 @@ class BtSendRecActivity : BaseActivity<EmptyMediator>() {
     val TAG: String = "SendAct"
 
     private lateinit var mDevice: BluetoothDevice
-    val mBtService = BtService.getInstance()
+    private val mBtManager = BtManager.getInstance()
     override fun getLayoutId() = R.layout.activity_send_rec
 
     override fun initialize() {
@@ -47,9 +47,8 @@ class BtSendRecActivity : BaseActivity<EmptyMediator>() {
         }
         mBinding.btnSend.click { sendText() }
 
-        mBtService.setOnDateReceiveListener { bytes ->
+        mBtManager.setOnDataReceiveCallback { bytes ->
             runOnUiThread {
-
                 val textStr = mBinding.tvReceiveText.text.toString()
                 mBinding.tvReceiveText.setText(textStr + "\n" + String(bytes))
             }
@@ -79,7 +78,7 @@ class BtSendRecActivity : BaseActivity<EmptyMediator>() {
         }
         val bytes = text.toByteArray()
         LogUtil.e(TAG, "发送地址：" + mDevice.address)
-        mBtService.write(bytes)
+        mBtManager.write(bytes)
     }
 
 }
