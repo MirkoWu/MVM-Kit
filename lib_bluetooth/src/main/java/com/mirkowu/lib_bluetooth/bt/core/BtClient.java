@@ -1,4 +1,4 @@
-package com.mirkowu.mvm.classicsbluetooth;
+package com.mirkowu.lib_bluetooth.bt.core;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,9 +10,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.mirkowu.mvm.classicsbluetooth.callback.OnConnectStateCallback;
-import com.mirkowu.mvm.classicsbluetooth.callback.OnDataReceiveCallback;
-import com.mirkowu.mvm.classicsbluetooth.callback.OnDataWriteCallback;
+
+import com.mirkowu.lib_bluetooth.bt.callback.OnConnectStateCallback;
+import com.mirkowu.lib_bluetooth.bt.callback.OnDataReceiveCallback;
+import com.mirkowu.lib_bluetooth.bt.callback.OnDataWriteCallback;
+import com.mirkowu.lib_bluetooth.bt.utils.BtCache;
+import com.mirkowu.lib_bluetooth.bt.utils.BtLog;
 
 import java.util.UUID;
 
@@ -39,6 +42,8 @@ public class BtClient {
     // SECURE "fa87c0d0-afac-11de-8a39-0800200c9a66"
     // SPP "0001101-0000-1000-8000-00805F9B34FB"
     public static final int STATE_CONNECTED = 3; // now connected to a remote device
+    public static final int STATE_DISCONNECT = 4; // 断开连接
+
     // Debugging
     private static final String TAG = "BtClient";
     // Name for the SDP record when creating server socket
@@ -130,7 +135,14 @@ public class BtClient {
                 BtLog.e(TAG, "已连接");
 //                EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "已连接"));
                 if (mOnConnectStateCallback != null) {
-                    mOnConnectStateCallback.onConnectSuccess();
+                    mOnConnectStateCallback.onConnectSuccess(mDevice);
+                }
+                break;
+            case STATE_DISCONNECT:
+                BtLog.e(TAG, "断开连接");
+//                EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "断开连接"));
+                if (mOnConnectStateCallback != null) {
+                    mOnConnectStateCallback.onDisConnect(mDevice);
                 }
                 break;
             default:
@@ -323,7 +335,7 @@ public class BtClient {
 //         Send a failure message back to the Activity
         // EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_TOAST, "蓝牙连接断开"));
         BtLog.e(TAG, "蓝牙连接断开");
-        setState(STATE_NONE);
+        setState(STATE_DISCONNECT);
         // Start the service over to restart listening mode
         start();
     }

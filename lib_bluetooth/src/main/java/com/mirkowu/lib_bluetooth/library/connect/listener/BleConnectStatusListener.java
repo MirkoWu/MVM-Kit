@@ -1,6 +1,7 @@
 package com.mirkowu.lib_bluetooth.library.connect.listener;
 
-import com.inuker.bluetooth.library.receiver.listener.BluetoothClientListener;
+
+import com.mirkowu.lib_bluetooth.library.receiver.listener.BluetoothClientListener;
 
 /**
  * Created by dingjikerbo on 16/11/26.

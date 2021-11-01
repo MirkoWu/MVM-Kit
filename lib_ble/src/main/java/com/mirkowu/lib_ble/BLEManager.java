@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
+import com.mirkowu.lib_ble.ble.BleLog;
 import com.mirkowu.lib_ble.service.BLEService;
 import com.mirkowu.lib_util.LogUtil;
 import com.mirkowu.lib_util.utilcode.util.Utils;
@@ -107,7 +108,7 @@ public class BLEManager {
 
     private BLEManager() {
         if (!initialize()) {
-            LogUtil.e(TAG, "BLEManager: 初始化失败");
+            BleLog.e(TAG, "BLEManager: 初始化失败");
         }
     }
 
@@ -130,7 +131,7 @@ public class BLEManager {
             mNotifyCharacteristic.setValue(data);
             mBluetoothGatt.writeCharacteristic(mNotifyCharacteristic);
         } else {
-            LogUtil.e(TAG, " writeValue: failed , UnConnected");
+            BleLog.e(TAG, " writeValue: failed , UnConnected");
         }
     }
 
@@ -140,19 +141,19 @@ public class BLEManager {
      * @param gattServices
      */
     public void findService(List<BluetoothGattService> gattServices) {
-        LogUtil.i(TAG, "BluetoothGattService Count is:" + gattServices.size());
+        BleLog.i(TAG, "BluetoothGattService Count is:" + gattServices.size());
         for (BluetoothGattService gattService : gattServices) {
-            LogUtil.i(TAG, "发现服务：" + gattService.getUuid().toString());
-            //  LogUtil.i(TAG, UUID_SERVICE.toString());
+            BleLog.i(TAG, "发现服务：" + gattService.getUuid().toString());
+            //  BleLog.i(TAG, UUID_SERVICE.toString());
             if (TextUtils.isEmpty(UUID_SERVICE) && gattService.getUuid().toString().equalsIgnoreCase(UUID_SERVICE)) { //在各服务里找到需要的服务
                 List<BluetoothGattCharacteristic> gattCharacteristics =
                         gattService.getCharacteristics();
-                LogUtil.i(TAG, "Characteristics Count is:" + gattCharacteristics.size());
+                BleLog.i(TAG, "Characteristics Count is:" + gattCharacteristics.size());
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                    LogUtil.i(TAG, "特征值：" + gattCharacteristic.getUuid().toString());
+                    BleLog.i(TAG, "特征值：" + gattCharacteristic.getUuid().toString());
                     if (TextUtils.isEmpty(UUID_NOTIFY) && gattCharacteristic.getUuid().toString().equalsIgnoreCase(UUID_NOTIFY)) { //在各特征值里找到需要的特征值
 
-                        LogUtil.i(TAG, "已发现服务特征值: " + UUID_NOTIFY);
+                        BleLog.i(TAG, "已发现服务特征值: " + UUID_NOTIFY);
                         mNotifyCharacteristic = gattCharacteristic;
                         setCharacteristicNotification(gattCharacteristic, true); //开启特征值
                         broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED); //已发现服务特征值，发送广播通知
@@ -171,22 +172,22 @@ public class BLEManager {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
-            LogUtil.i(TAG, "oldStatus=" + status + " NewStates=" + newState);
+            BleLog.i(TAG, "oldStatus=" + status + " NewStates=" + newState);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) { //连接成功
                     mConnected = true;
                     intentAction = ACTION_GATT_CONNECTED;
 
                     broadcastUpdate(intentAction);
-                    LogUtil.i(TAG, "Connected to GATT server.");
+                    BleLog.i(TAG, "Connected to GATT server.");
                     // Attempts to discover services after successful connection.
-                    LogUtil.i(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
+                    BleLog.i(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { //断开连接
                     mConnected = false;
                     intentAction = ACTION_GATT_DISCONNECTED;
                     mBluetoothGatt.close();
                     mBluetoothGatt = null;
-                    LogUtil.i(TAG, "Disconnected from GATT server.");
+                    BleLog.i(TAG, "Disconnected from GATT server.");
                     broadcastUpdate(intentAction);
                 }
             }
@@ -200,11 +201,11 @@ public class BLEManager {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                LogUtil.d(TAG, "onServicesDiscovered received: " + status);
+                BleLog.d(TAG, "onServicesDiscovered received: " + status);
                 findService(gatt.getServices());
             } else {
                 if (mBluetoothGatt.getDevice().getUuids() == null) {
-                    LogUtil.d(TAG, "onServicesDiscovered received: " + status);
+                    BleLog.d(TAG, "onServicesDiscovered received: " + status);
                 }
             }
         }
@@ -232,37 +233,37 @@ public class BLEManager {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            LogUtil.e(TAG, "OnCharacteristicWrite");
+            BleLog.e(TAG, "OnCharacteristicWrite");
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic,
                                           int status) {
-            LogUtil.e(TAG, "OnCharacteristicWrite");
+            BleLog.e(TAG, "OnCharacteristicWrite");
         }
 
         @Override
         public void onDescriptorRead(BluetoothGatt gatt,
                                      BluetoothGattDescriptor bd,
                                      int status) {
-            LogUtil.e(TAG, "onDescriptorRead");
+            BleLog.e(TAG, "onDescriptorRead");
         }
 
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt,
                                       BluetoothGattDescriptor bd,
                                       int status) {
-            LogUtil.e(TAG, "onDescriptorWrite");
+            BleLog.e(TAG, "onDescriptorWrite");
         }
 
         @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int a, int b) {
-            LogUtil.e(TAG, "onReadRemoteRssi");
+            BleLog.e(TAG, "onReadRemoteRssi");
         }
 
         @Override
         public void onReliableWriteCompleted(BluetoothGatt gatt, int a) {
-            LogUtil.e(TAG, "onReliableWriteCompleted");
+            BleLog.e(TAG, "onReliableWriteCompleted");
         }
 
     };

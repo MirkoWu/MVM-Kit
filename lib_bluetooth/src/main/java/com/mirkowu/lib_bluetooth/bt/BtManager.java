@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mirkowu.mvm.classicsbluetooth;
+package com.mirkowu.lib_bluetooth.bt;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -25,12 +25,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
-import com.mirkowu.mvm.classicsbluetooth.callback.OnConnectStateCallback;
-import com.mirkowu.mvm.classicsbluetooth.callback.OnDataReceiveCallback;
+
+import com.mirkowu.lib_bluetooth.bt.callback.OnConnectStateCallback;
+import com.mirkowu.lib_bluetooth.bt.callback.OnDataReceiveCallback;
+import com.mirkowu.lib_bluetooth.bt.core.BtClient;
+import com.mirkowu.lib_bluetooth.bt.utils.BtCache;
+import com.mirkowu.lib_bluetooth.bt.utils.BtLog;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +52,7 @@ import java.util.UUID;
  */
 public final class BtManager {
 
-    private final static String TAG = "Ble";
+    private final static String TAG = "BtManager";
     //    private static Options options;
     private Context context;
     //打开蓝牙标志位
@@ -67,7 +73,6 @@ public final class BtManager {
     }
 
     private static volatile BtManager sInstance;
-
 
     public static BtManager getInstance() {
         if (sInstance == null) {
@@ -164,12 +169,16 @@ public final class BtManager {
     }
 
     public void connect(BluetoothDevice device, OnConnectStateCallback onConnectStateCallback) {
-        BtClient.getInstance().connect(device, onConnectStateCallback);
+        mOnConnectStateCallback = onConnectStateCallback;
+        BtClient.getInstance().connect(device, mWrapperOnConnectStateCallback);
     }
 
-    public void connect(BluetoothSocket socket,
-                        BluetoothDevice device) {
-        BtClient.getInstance().connected(socket, device);
+    public int getConnectState() {
+        return BtClient.getInstance().getState();
+    }
+
+    public boolean isConnected() {
+        return BtClient.getInstance().getState() == BtClient.STATE_CONNECTED;
     }
 
     public BluetoothDevice getConnectDevice() {
@@ -189,6 +198,55 @@ public final class BtManager {
             connect(device, onConnectStateCallback);
         }
     }
+
+    public void removeConnectStateCallback() {
+        mOnConnectStateCallback = null;
+    }
+
+    private OnConnectStateCallback mOnConnectStateCallback;
+    private OnConnectStateCallback mWrapperOnConnectStateCallback = new OnConnectStateCallback() {
+        @Override
+        public void onConnectSuccess(BluetoothDevice device) {
+            if (mOnConnectStateCallback != null) {
+                mOnConnectStateCallback.onConnectSuccess(device);
+            }
+        }
+
+        @Override
+        public void onDisConnect(BluetoothDevice device) {
+            if (mOnConnectStateCallback != null) {
+                mOnConnectStateCallback.onDisConnect(device);
+            }
+        }
+
+        @Override
+        public void onConnectFailed() {
+            if (mOnConnectStateCallback != null) {
+                mOnConnectStateCallback.onConnectFailed();
+            }
+        }
+
+        @Override
+        public void onConnecting() {
+            if (mOnConnectStateCallback != null) {
+                mOnConnectStateCallback.onConnecting();
+            }
+        }
+
+        @Override
+        public void onWaitConnect() {
+            if (mOnConnectStateCallback != null) {
+                mOnConnectStateCallback.onWaitConnect();
+            }
+        }
+
+        @Override
+        public void onConnectStateChanged(int state) {
+            if (mOnConnectStateCallback != null) {
+                mOnConnectStateCallback.onConnectStateChanged(state);
+            }
+        }
+    };
 
     /**
      * 是否能自动连接
@@ -281,14 +339,15 @@ public final class BtManager {
     /**
      * @return 是否支持蓝牙
      */
-    public boolean isSupportBle(Context context) {
-        return (getBluetoothAdapter() != null && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE));
+    public boolean isSupportBluetooth(Context context) {
+        return (getBluetoothAdapter() != null && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH));
     }
+
 
     /**
      * @return 蓝牙是否打开
      */
-    public boolean isBleEnable() {
+    public boolean isBluetoothEnable() {
         BluetoothAdapter bluetoothAdapter = getBluetoothAdapter();
         return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
     }
@@ -301,7 +360,7 @@ public final class BtManager {
     public void turnOnBlueTooth(Activity activity) {
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
-        if (!isBleEnable()) {
+        if (!isBluetoothEnable()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
@@ -311,7 +370,7 @@ public final class BtManager {
      * 强制打开蓝牙（不弹出系统弹出框）
      */
     public void turnOnBlueToothNo() {
-        if (!isBleEnable()) {
+        if (!isBluetoothEnable()) {
             if (bluetoothAdapter != null) {
                 bluetoothAdapter.enable();
             }
@@ -322,12 +381,34 @@ public final class BtManager {
      * 关闭蓝牙
      */
     public boolean turnOffBlueTooth() {
-        if (isBleEnable()) {
+        if (isBluetoothEnable()) {
             return bluetoothAdapter.disable();
         }
         return true;
     }
 
+    /**
+     * 是否打开GPS
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isGpsOpen(Context context) {
+        int locationMode = 0;
+        String locationProviders;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            try {
+                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+        } else {
+            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            return !TextUtils.isEmpty(locationProviders);
+        }
+    }
 
     /**
      * register bluetooth receiver

@@ -1,9 +1,13 @@
-package com.mirkowu.mvm.classicsbluetooth;
+package com.mirkowu.lib_bluetooth.bt.queue;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.text.TextUtils;
 
+
+import com.mirkowu.lib_bluetooth.bt.BtManager;
+import com.mirkowu.lib_bluetooth.bt.core.BtClient;
+import com.mirkowu.lib_bluetooth.bt.utils.BtCache;
 
 import java.util.ArrayList;
 

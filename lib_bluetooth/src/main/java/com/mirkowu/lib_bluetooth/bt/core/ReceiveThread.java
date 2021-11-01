@@ -1,9 +1,11 @@
-package com.mirkowu.mvm.classicsbluetooth;
+package com.mirkowu.lib_bluetooth.bt.core;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.mirkowu.mvm.classicsbluetooth.callback.OnDataReceiveCallback;
+
+import com.mirkowu.lib_bluetooth.bt.callback.OnDataReceiveCallback;
+import com.mirkowu.lib_bluetooth.bt.utils.BtLog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +64,7 @@ public class ReceiveThread extends Thread {
 
     public void write(byte[] buffer) {
         try {
+            Log.e(TAG, "bluetooth write");
             if (mOutStream != null) {
                 mOutStream.write(buffer);
             }
@@ -73,6 +76,7 @@ public class ReceiveThread extends Thread {
     public void write(byte[] buffer, long delayTime) {
         if (mOutStream != null) {
             try {
+                Log.e(TAG, "bluetooth write");
                 mOutStream.write(buffer);
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);

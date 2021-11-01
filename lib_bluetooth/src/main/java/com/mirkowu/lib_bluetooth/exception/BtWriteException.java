@@ -4,18 +4,18 @@ package com.mirkowu.lib_bluetooth.exception;
  * Created by LiuLei on 2017/10/19.
  */
 
-public class BleWriteException extends BtException {
+public class BtWriteException extends BtException {
 
     private static final long serialVersionUID = -6886122979840622897L;
 
-    public BleWriteException() {
+    public BtWriteException() {
     }
 
-    public BleWriteException(String message) {
+    public BtWriteException(String message) {
         super(message);
     }
 
-    public BleWriteException(String s, Throwable ex) {
+    public BtWriteException(String s, Throwable ex) {
         super(s, ex);
     }
 }

@@ -1,9 +1,11 @@
-package com.mirkowu.mvm.classicsbluetooth;
+package com.mirkowu.lib_bluetooth.bt.core;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+
+import com.mirkowu.lib_bluetooth.bt.BtManager;
 
 import java.io.IOException;
 

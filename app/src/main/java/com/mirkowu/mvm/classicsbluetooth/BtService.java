@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -12,8 +11,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.mirkowu.lib_util.LogUtil;
-import com.mirkowu.lib_util.utilcode.util.SPUtils;
 import com.mirkowu.mvm.classicsbluetooth.callback.OnConnectStateCallback;
 import com.mirkowu.mvm.classicsbluetooth.callback.OnDataReceiveCallback;
 import com.mirkowu.mvm.classicsbluetooth.callback.OnDataWriteCallback;
@@ -118,28 +115,28 @@ public class BtService {
         // Give the new state to the Handler so the UI Activity can update
         switch (mState) {
             case STATE_LISTEN:
-                LogUtil.e(TAG, "等待连接");
+                BtLog.e(TAG, "等待连接");
 //                EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "等待连接"));
                 if (mOnConnectStateCallback != null) {
                     mOnConnectStateCallback.onWaitConnect();
                 }
                 break;
             case STATE_CONNECTING:
-                LogUtil.e(TAG, "正在连接");
+                BtLog.e(TAG, "正在连接");
 //                EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "正在连接"));
                 if (mOnConnectStateCallback != null) {
                     mOnConnectStateCallback.onConnecting();
                 }
                 break;
             case STATE_CONNECTED:
-                LogUtil.e(TAG, "已连接");
+                BtLog.e(TAG, "已连接");
 //                EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "已连接"));
                 if (mOnConnectStateCallback != null) {
                     mOnConnectStateCallback.onConnectSuccess();
                 }
                 break;
             default:
-                LogUtil.e(TAG, "未连接");
+                BtLog.e(TAG, "未连接");
 //                EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_STATE_CHANGE, "未连接"));
                 if (mOnConnectStateCallback != null) {
                     mOnConnectStateCallback.onConnectFailed();
@@ -181,7 +178,7 @@ public class BtService {
     public synchronized void connect(BluetoothDevice device) {
         mDevice = device;
         Log.d(TAG, "connect to: " + device);
-        LogUtil.e(TAG, "正在连接蓝牙设备");
+        BtLog.e(TAG, "正在连接蓝牙设备");
 //        EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_TOAST, "正在连接蓝牙设备"));
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -237,7 +234,7 @@ public class BtService {
 
         // Send the name of the connected device back to the UI Activity
 //        EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_TOAST, "蓝牙设备连接成功"));
-        LogUtil.e(TAG, "蓝牙设备连接成功");
+        BtLog.e(TAG, "蓝牙设备连接成功");
         setState(STATE_CONNECTED);
 
         // call print queue to print
@@ -312,7 +309,7 @@ public class BtService {
      */
       void connectionFailed() {
 //         Send a failure message back to the Activity
-        LogUtil.e(TAG, "蓝牙连接失败");
+        BtLog.e(TAG, "蓝牙连接失败");
 //        EventBus.getDefault().post(new PrintMsgEvent(PrinterMsgType.MESSAGE_TOAST, "蓝牙连接失败,请重启打印机再试"));
         setState(STATE_NONE);
         // Start the service over to restart listening mode
@@ -434,7 +431,7 @@ public class BtService {
         }
 
         public void cancel() {
-            Log.d(TAG, "Socket Type" + mSocketType + "cancel " + this);
+            Log.e(TAG, "AcceptThread Socket Type" + mSocketType + "cancel " + this);
             try {
                 mmServerSocket.close();
             } catch (Exception e) {
@@ -470,7 +467,7 @@ public class BtService {
 
         public void run() {
             try {
-                Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+                Log.e(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
                 setName("ConnectThread" + mSocketType);
 
                 // Always cancel discovery because it will slow down a connection
@@ -553,7 +550,7 @@ public class BtService {
                     // send data
                     byte[] data = getBytes(buffer, 0, bytes);
                     String dataStr = new String(data);
-                    LogUtil.e(TAG, "收到数据 = " + dataStr);
+                    BtLog.e(TAG, "收到数据 = " + dataStr);
                     if (mOnDataReceiveCallback != null) {
                         mOnDataReceiveCallback.onDataReceive(data);
                     }
@@ -609,7 +606,23 @@ public class BtService {
             }
         }
     }
+    public void release(){
+        if (mConnectThread != null) {
+            mConnectThread.cancel();
+            mConnectThread = null;
+        }
 
+        if (mConnectedThread != null) {
+            mConnectedThread.cancel();
+            mConnectedThread = null;
+        }
+
+        if (mAcceptThread != null) {
+            mAcceptThread.cancel();
+            mAcceptThread = null;
+        }
+        setState(STATE_NONE);
+    }
     public static byte[] getBytes(byte[] bytes, int offset, int len) {
         byte[] result = new byte[len];
         System.arraycopy(bytes, offset, result, 0, len);

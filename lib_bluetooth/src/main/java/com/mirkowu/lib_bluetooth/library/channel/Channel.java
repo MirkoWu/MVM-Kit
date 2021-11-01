@@ -10,16 +10,17 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.SparseArray;
 
-import com.inuker.bluetooth.library.BluetoothContext;
-import com.inuker.bluetooth.library.channel.packet.ACKPacket;
-import com.inuker.bluetooth.library.channel.packet.CTRPacket;
-import com.inuker.bluetooth.library.channel.packet.DataPacket;
-import com.inuker.bluetooth.library.channel.packet.Packet;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.inuker.bluetooth.library.utils.proxy.ProxyBulk;
-import com.inuker.bluetooth.library.utils.proxy.ProxyInterceptor;
-import com.inuker.bluetooth.library.utils.proxy.ProxyUtils;
+
+import com.mirkowu.lib_bluetooth.library.BluetoothContext;
+import com.mirkowu.lib_bluetooth.library.channel.packet.ACKPacket;
+import com.mirkowu.lib_bluetooth.library.channel.packet.CTRPacket;
+import com.mirkowu.lib_bluetooth.library.channel.packet.DataPacket;
+import com.mirkowu.lib_bluetooth.library.channel.packet.Packet;
+import com.mirkowu.lib_bluetooth.library.utils.BluetoothLog;
+import com.mirkowu.lib_bluetooth.library.utils.ByteUtils;
+import com.mirkowu.lib_bluetooth.library.utils.proxy.ProxyBulk;
+import com.mirkowu.lib_bluetooth.library.utils.proxy.ProxyInterceptor;
+import com.mirkowu.lib_bluetooth.library.utils.proxy.ProxyUtils;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;

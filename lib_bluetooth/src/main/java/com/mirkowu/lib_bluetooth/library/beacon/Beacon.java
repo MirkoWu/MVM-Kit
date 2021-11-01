@@ -1,6 +1,7 @@
 package com.mirkowu.lib_bluetooth.library.beacon;
 
-import com.inuker.bluetooth.library.utils.ByteUtils;
+
+import com.mirkowu.lib_bluetooth.library.utils.ByteUtils;
 
 import java.util.LinkedList;
 import java.util.List;

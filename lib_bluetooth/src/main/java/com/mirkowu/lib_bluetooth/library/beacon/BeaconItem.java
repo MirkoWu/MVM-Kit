@@ -1,6 +1,5 @@
 package com.mirkowu.lib_bluetooth.library.beacon;
 
-import com.inuker.bluetooth.library.utils.ByteUtils;
 
 /**
  * Created by dingjikerbo on 2016/9/5.

@@ -1,6 +1,7 @@
 package com.mirkowu.lib_bluetooth.library.channel.packet;
 
-import com.inuker.bluetooth.library.utils.ByteUtils;
+
+import com.mirkowu.lib_bluetooth.library.utils.ByteUtils;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

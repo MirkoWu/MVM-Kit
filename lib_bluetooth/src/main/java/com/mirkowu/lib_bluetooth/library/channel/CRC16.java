@@ -1,6 +1,7 @@
 package com.mirkowu.lib_bluetooth.library.channel;
 
-import com.inuker.bluetooth.library.utils.ByteUtils;
+
+import com.mirkowu.lib_bluetooth.library.utils.ByteUtils;
 
 /**
  * Created by liwentian on 2017/4/15.

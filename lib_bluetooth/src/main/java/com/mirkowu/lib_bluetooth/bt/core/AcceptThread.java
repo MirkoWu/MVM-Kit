@@ -1,11 +1,14 @@
-package com.mirkowu.mvm.classicsbluetooth;
+package com.mirkowu.lib_bluetooth.bt.core;
 
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 
+import com.mirkowu.lib_bluetooth.bt.BtManager;
+
 import java.io.IOException;
+
 
 public class AcceptThread extends Thread {
     public static final String TAG = "AcceptThread";

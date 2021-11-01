@@ -14,7 +14,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 
-import com.mirkowu.lib_util.LogUtil;
+
+import com.mirkowu.lib_ble.ble.BleLog;
 
 import java.util.UUID;
 
@@ -48,10 +49,10 @@ public class BLEClient {
             mBLEService = ((BLEService.LocalBinder) service).getService();
 
             if (!mBLEService.initialize()) {
-                LogUtil.e(TAG, "Unable to initialize Bluetooth");
+                BleLog.e(TAG, "Unable to initialize Bluetooth");
                 return;
             }
-            LogUtil.d(TAG, "mBLEService is okay");
+            BleLog.d(TAG, "mBLEService is okay");
 
             if (onServiceConnectListener != null) {
                 onServiceConnectListener.onServiceConnected();
@@ -96,7 +97,7 @@ public class BLEClient {
         this.onServiceConnectListener = onServiceConnectListener;
         Intent gattServiceIntent = new Intent(context, BLEService.class);
         boolean bindResult = context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        LogUtil.e(TAG, "Try to bindService = " + bindResult);
+        BleLog.e(TAG, "Try to bindService = " + bindResult);
         return bindResult;
     }
 
@@ -242,9 +243,9 @@ public class BLEClient {
         this.mBleAddress = mBleAddress;
         if (mBLEService != null) {
             boolean result = mBLEService.connect(mBleAddress, autoConnect);
-            LogUtil.d(TAG, "Connect request result=" + result);
+            BleLog.d(TAG, "Connect request result=" + result);
         } else {
-            LogUtil.e(TAG, "Connect  failed mBLEService ==null");
+            BleLog.e(TAG, "Connect  failed mBLEService ==null");
         }
     }
 
@@ -254,7 +255,7 @@ public class BLEClient {
     public void sendData(byte[] data) {
         if (mBLEService != null) {
             mBLEService.writeValue(data);
-            LogUtil.d(TAG, "disconnectBle" + new String(data));
+            BleLog.d(TAG, "disconnectBle" + new String(data));
         }
     }
 
@@ -265,7 +266,7 @@ public class BLEClient {
         if (mBLEService != null) {
             mBLEService.disconnect();
         }
-        LogUtil.d(TAG, "disconnectBle");
+        BleLog.d(TAG, "disconnectBle");
     }
 
     /**
@@ -276,6 +277,6 @@ public class BLEClient {
             mBLEService.close();
             mBLEService = null;
         }
-        LogUtil.d(TAG, "close");
+        BleLog.d(TAG, "close");
     }
 }

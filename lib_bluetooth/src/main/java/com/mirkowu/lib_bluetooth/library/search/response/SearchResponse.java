@@ -1,6 +1,5 @@
 package com.mirkowu.lib_bluetooth.library.search.response;
 
-import com.inuker.bluetooth.library.search.SearchResult;
 
 /**
  * Created by dingjikerbo on 2016/9/1.

@@ -1,6 +1,5 @@
 package com.mirkowu.lib_bluetooth.library.beacon;
 
-import com.inuker.bluetooth.library.utils.ByteUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -1,6 +1,7 @@
 package com.mirkowu.lib_bluetooth.library.search.response;
 
-import com.inuker.bluetooth.library.search.SearchResult;
+
+import com.mirkowu.lib_bluetooth.library.search.SearchResult;
 
 public interface BluetoothSearchResponse {
     void onSearchStarted();
