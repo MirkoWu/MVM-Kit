@@ -9,7 +9,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.mirkowu.mvmtools"
+        applicationId "com.mirkowu.mvm.kit"
         minSdkVersion ext.minSdkVersion
         targetSdkVersion ext.targetSdkVersion
         versionCode 1
@@ -55,7 +55,14 @@ dependencies {
     implementation "com.github.mirkowu.mvm:lib_util:$ext.mvm_version"
     implementation "com.github.mirkowu.mvm:lib_screen:$ext.mvm_version"
 
-//    implementation "com.github.mirkowu.tools:lib_ble:$ext.tools_version"
-    implementation project(':lib_ble')
+//是否使用本地lib
+    def useLocalModule = true
+    if (!useLocalModule) {
+        implementation "com.github.mirkowu.tools:lib_ble:$ext.mvm_kit_version"
+//        implementation "com.github.mirkowu.tools:lib_bluetooth:$ext.mvm_kit_version"
+    }else {
+        implementation project(':lib_ble')
+//        implementation project(':lib_bluetooth')
+    }
 
 }

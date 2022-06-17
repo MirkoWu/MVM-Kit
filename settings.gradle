@@ -1,6 +1,4 @@
-rootProject.name = "mvmtools"
+rootProject.name = "MVM-Kit"
 include ':app'
-include ':lib_widget'
 include ':lib_ble'
-include ':lib_util'
 include ':lib_bluetooth'

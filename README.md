@@ -1,15 +1,18 @@
 ### tools
-[![](https://jitpack.io/v/mirkowu/tools.svg)](https://jitpack.io/#mirkowu/tools)
+mvm[![](https://jitpack.io/v/mirkowu/mvm-kit.svg)](https://jitpack.io/#mirkowu/MVM-Kit)
 
 
 
 ### 使用
+依赖jitpack
+```
+maven { url 'https://jitpack.io' }
+```
 
 ```
-implementation "com.github.mirkowu.tools:lib_ble:$ext.tools_version" //蓝牙ble
-implementation "com.github.mirkowu.mvm:lib_util:$ext.mvm_version" //log工具
+implementation "com.github.mirkowu.mvm-kit:lib_ble:$ext.mvm_kit_version" //蓝牙ble
 ```
-[mvm项目](https://github.com/MirkoWu/MVM)
+[MVM项目](https://github.com/MirkoWu/MVM)
 
 ### 功能
 - [x] 蓝牙ble

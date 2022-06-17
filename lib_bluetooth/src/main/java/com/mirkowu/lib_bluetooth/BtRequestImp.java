@@ -21,6 +21,4 @@ public class BtRequestImp {
     public void connect(){
 
     }
-
-    public
 }
