@@ -11,7 +11,7 @@ import com.mirkowu.lib_ble.service.BLEClient
 import com.mirkowu.lib_ble.service.BLEService
 import com.mirkowu.lib_ble.service.OnServiceConnectListener
 import com.mirkowu.lib_util.LogUtil
-import com.mirkowu.lib_util.PermissionsUtil
+import com.mirkowu.lib_util.PermissionsUtils
 import com.mirkowu.lib_util.utilcode.util.ConvertUtils
 import com.mirkowu.lib_util.utilcode.util.ToastUtils
 import com.mirkowu.mvm.R
@@ -74,9 +74,9 @@ class SearchBleActivity : BaseActivity<EmptyMediator>() {
 
     private fun startLeScan() {
         if (client.isSupportBLE(context)) {
-            PermissionsUtil.getInstance()
-                .requestPermissions(this, PermissionsUtil.GROUP_BLUETOOTH,
-                    object : PermissionsUtil.OnPermissionsListener {
+            PermissionsUtils.getInstance()
+                .requestPermissions(this, PermissionsUtils.GROUP_BLUETOOTH,
+                    object : PermissionsUtils.OnPermissionsListener {
                         override fun onPermissionGranted(requestCode: Int) {
                             if (client.isEnable()) {
                                 client.bindService(context, object :

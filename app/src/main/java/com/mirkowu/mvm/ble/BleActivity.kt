@@ -210,12 +210,12 @@ class BleActivity : BaseActivity<EmptyMediator>() {
 //            bleManager.disconnect()
 //        }
 //        if (bleManager.isSupportBLE(context)) {
-//            PermissionsUtil.getInstance()
+//            PermissionsUtils.getInstance()
 //                .requestPermissions(this, arrayOf(
 //                    Manifest.permission.ACCESS_COARSE_LOCATION,
 //                    Manifest.permission.BLUETOOTH
 //                ),
-//                    object : PermissionsUtil.OnPermissionsListener {
+//                    object : PermissionsUtils.OnPermissionsListener {
 //                        override fun onPermissionGranted(requestCode: Int) {
 //                            if (bleManager.isEnable()) {
 //                                val scanning = bleManager.startLeScan { device, rssi, scanRecord ->
